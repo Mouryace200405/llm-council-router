@@ -14,6 +14,12 @@ from typing import Dict, List
 
 from src.engines.classifier import ClassificationResult
 
+# NOTE: The "multimodal" expert (Qwen3.5-9B) is a text-only model.
+# True vision/RAG/tool-use capabilities require a dedicated multimodal model
+# (e.g., LLaVA-NeXT, Qwen2-VL). In this research prototype, "multimodal" routes
+# primarily handle creative/long-form text generation, brainstorming, and
+# rewriting tasks. This is a known limitation discussed in the paper.
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +50,8 @@ class Router:
         scores["multimodal"] = m_score
         reasons.append(m_reason)
 
-        best = max(scores, key=scores.get)
+        # Tie-breaking priority: general > coding > multimodal
+        best = max(scores, key=lambda k: (scores[k], {"general": 2, "coding": 1, "multimodal": 0}[k]))
         confidence = scores[best]
 
         return RoutingDecision(
@@ -57,58 +64,65 @@ class Router:
     # ── Scoring functions (classifier only, no keywords) ─────────────────
 
     def _score_general(self, cls: ClassificationResult) -> tuple[float, str]:
-        parts = []
-        score = 0.0
+        parts = ["base=0.20"]
+        score = 0.20
 
         # Higher reasoning → Q&A with analysis → general
-        if cls.reasoning > 0.030:
+        if cls.reasoning > 0.03:
             score += 0.30
             parts.append(f"reasoning={cls.reasoning:.4f}")
 
         # Higher constraint → more structured → general
-        if cls.constraint_ct > 0.010:
-            score += 0.20
+        if cls.constraint_ct > 0.04:
+            score += 0.25
             parts.append(f"constraint={cls.constraint_ct:.4f}")
 
-        # Low creativity + high domain knowledge → factual Q&A → general
-        if cls.creativity_scope <= 0.025 and cls.domain_knowledge > 0.50:
+        # Moderate creativity + high domain knowledge → factual Q&A → general
+        if cls.creativity_scope > 0.02 and cls.domain_knowledge > 0.50:
             score += 0.15
             parts.append("factual_qa=1")
 
         # Task type bonus
-        if cls.task_type_1 in {"Closed QA", "Chatbot", "Open QA"}:
+        if cls.task_type_1 in {"Closed QA", "Chatbot", "Open QA", "Summarization"}:
             score += 0.10
             parts.append(f"task={cls.task_type_1}")
 
-        return score, f"general={score:.2f} ({', '.join(parts)})" if parts else "general=0.00"
+        return score, f"general={score:.2f} ({', '.join(parts)})"
 
     def _score_coding(self, cls: ClassificationResult) -> tuple[float, str]:
-        # Coding prompts consistently have very low reasoning (< 0.02)
-        # "Code Generation" task type always qualifies regardless of reasoning
-        if cls.reasoning >= 0.020 and cls.task_type_1 != "Code Generation":
-            return 0.0, "coding=0.00 (reasoning too high)"
+        # Gates: high-reasoning prompts (analysis/explanation) go elsewhere
+        if cls.reasoning > 0.03 and cls.task_type_1 != "Code Generation":
+            return 0.0, f"coding=0.00 (reasoning={cls.reasoning:.4f})"
+        # Prompts the model sees as "low creativity" (structured) are not coding
+        if cls.creativity_scope > 0.025 and cls.task_type_1 != "Code Generation":
+            return 0.0, f"coding=0.00 (creativity={cls.creativity_scope:.4f})"
+        # Highly constrained prompts are instructions, not open-ended coding
+        if cls.constraint_ct > 0.04:
+            return 0.0, f"coding=0.00 (constraint={cls.constraint_ct:.4f})"
 
-        parts = []
         score = 0.0
+        parts = []
 
-        # Low creativity → logical/structured → coding
-        if cls.creativity_scope <= 0.025:
-            score += 0.35
-            parts.append(f"creativity={cls.creativity_scope:.4f}")
-
-        # High domain knowledge → technical domain → coding
-        if cls.domain_knowledge > 0.50:
-            score += 0.30
+        # Creativity ≤ 0.025 means the model assigns HIGH creativity
+        # Paired with domain knowledge to distinguish code from general
+        if cls.domain_knowledge > 0.60:
+            score += 0.50
+            parts.append(f"domain_know={cls.domain_knowledge:.4f}")
+        elif cls.domain_knowledge > 0.40:
+            score += 0.40
+            parts.append(f"domain_know={cls.domain_knowledge:.4f}")
+        else:
+            score += 0.20
             parts.append(f"domain_know={cls.domain_knowledge:.4f}")
 
-        # Low constraint → open-ended implementation → coding
-        if cls.constraint_ct <= 0.015:
-            score += 0.20
+        # Low constraint → more open-ended → coding
+        if cls.constraint_ct <= 0.005:
+            score += 0.10
             parts.append(f"constraint={cls.constraint_ct:.4f}")
 
         # Task type bonus
         if cls.task_type_1 == "Code Generation":
-            score += 0.20
+            score += 0.25
             parts.append(f"task={cls.task_type_1}")
 
         score = min(score, 0.95)
@@ -118,31 +132,33 @@ class Router:
         parts = []
         score = 0.0
 
-        # Creativity is the primary multimodal signal
+        # Model's creativity_scope: LOW score = HIGH creativity, HIGH score = LOW creativity
+        # creativity > 0.04 means the model sees the prompt as having LOW creativity
+        # (structured creative tasks like poems, stories, slogans)
         if cls.creativity_scope > 0.04:
-            score += 0.30
+            score += 0.35
             parts.append(f"creativity={cls.creativity_scope:.4f}")
             if cls.creativity_scope > 0.10:
-                score += 0.20
-                parts.append(f"high_creativity={cls.creativity_scope:.4f}")
-                if cls.creativity_scope > 0.20:
-                    score += 0.10
-                    parts.append(f"very_high_creativity={cls.creativity_scope:.4f}")
+                score += 0.15
+                parts.append(f"mid_creativity={cls.creativity_scope:.4f}")
+            if cls.creativity_scope > 0.20:
+                score += 0.15
+                parts.append(f"low_creativity={cls.creativity_scope:.4f}")
 
-        # Low domain knowledge + some creativity → creative non-technical
+        # Low domain knowledge + moderate creativity signal → creative non-technical
         if cls.domain_knowledge < 0.50 and cls.creativity_scope > 0.025:
             score += 0.20
             parts.append("creative_non_technical=1")
 
-        # High contextual knowledge → complex/planning
+        # High contextual knowledge → planning/long-form → multimodal
         if cls.contextual_knowledge > 0.30:
             score += 0.10
             parts.append(f"ctx_knowledge={cls.contextual_knowledge:.4f}")
 
-        # Task type bonus
-        if cls.task_type_1 in {"Text Generation", "Brainstorming"}:
+        # Task type bonus (secondary type gives better discrimination)
+        if cls.task_type_2 in {"Text Generation", "Brainstorming", "Rewrite"}:
             score += 0.15
-            parts.append(f"task={cls.task_type_1}")
+            parts.append(f"task_2={cls.task_type_2}")
 
         score = min(score, 0.95)
         return score, f"multimodal={score:.2f} ({', '.join(parts)})" if parts else "multimodal=0.00"

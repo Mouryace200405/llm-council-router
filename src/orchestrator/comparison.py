@@ -153,22 +153,51 @@ class ComparisonRunner:
         self._voting = MajorityVoting(self._adapters)
         self._dictatorship = Dictatorship(self._adapters, judge_key="general")
 
-    def run_comparison(self, prompt: str) -> ComparisonResult:
+    def run_comparison(self, prompt: str, mode: str = "all") -> ComparisonResult:
         enriched = self._enhancer.enhance(prompt)
-        cls = self._classifier.classify(enriched)
+        cls = self._classifier.classify(prompt)
+
+        empty = ModelResponse(text="", model_name="", latency_ms=0.0)
+        empty_responses: Dict[str, ModelResponse] = {}
 
         # --- Council mode ---
-        t0 = time.time()
-        decision = self._router.route(cls, raw_prompt=prompt)
-        council_adapter = self._adapters[decision.selected_expert]
-        council_resp = council_adapter.generate(enriched)
-        council_latency = (time.time() - t0) * 1000
+        if mode in ("council", "all"):
+            t0 = time.time()
+            decision = self._router.route(cls, raw_prompt=prompt)
+            council_adapter = self._adapters[decision.selected_expert]
+            council_resp = council_adapter.generate(enriched)
+            council_latency = (time.time() - t0) * 1000
+        else:
+            decision = self._router.route(cls, raw_prompt=prompt)
+            council_resp = empty
+            council_latency = 0.0
 
         # --- Majority voting ---
-        vote_responses, vote_winner, vote_conf, vote_latency = self._voting.run(enriched)
+        if mode in ("voting", "all"):
+            vote_responses, vote_winner, vote_conf, vote_latency = self._voting.run(enriched)
+        else:
+            vote_responses, vote_winner, vote_conf, vote_latency = empty_responses, "", 0.0, 0.0
 
         # --- Dictatorship ---
-        dict_responses, dict_chosen, dict_judge_resp, dict_latency = self._dictatorship.run(enriched)
+        if mode in ("dictator", "all"):
+            dict_responses, dict_chosen, dict_judge_resp, dict_latency = self._dictatorship.run(enriched)
+        else:
+            dict_responses, dict_chosen, dict_judge_resp, dict_latency = empty_responses, "", empty, 0.0
+
+        # Fill empty_responses for dictator when not run
+        if mode == "all":
+            pass
+        elif mode == "council":
+            vote_responses = {k: empty for k in ALL_EXPERTS}
+            dict_responses = {k: empty for k in ALL_EXPERTS}
+        elif mode == "voting":
+            dict_responses = {k: empty for k in ALL_EXPERTS}
+        elif mode == "dictator":
+            vote_responses = {k: empty for k in ALL_EXPERTS}
+        # Ensure at least council response is in all_responses for display
+        all_responses = dict(vote_responses) if vote_responses else {}
+        if council_resp and council_resp.text:
+            all_responses[decision.selected_expert] = council_resp
 
         # --- Energy (sample once at the end for the whole batch) ---
         energy = None
@@ -185,10 +214,10 @@ class ComparisonRunner:
             routing=decision,
             council_response=council_resp,
             council_expert=decision.selected_expert,
-            all_responses=vote_responses,
+            all_responses=all_responses,
             majority_vote_result=vote_winner,
             majority_confidence=vote_conf,
-            dictator_response=dict_judge_resp,
+            dictator_response=dict_judge_resp if mode in ("dictator", "all") else empty,
             dictator_chosen_expert=dict_chosen,
             council_latency=council_latency,
             voting_latency=vote_latency,

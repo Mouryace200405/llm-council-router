@@ -1,0 +1,634 @@
+{
+  "accuracy": 80.0,
+  "correct": 20,
+  "total": 25,
+  "confusion_matrix": {
+    "coding": {
+      "coding": 8,
+      "general": 1,
+      "multimodal": 0
+    },
+    "general": {
+      "coding": 1,
+      "general": 8,
+      "multimodal": 1
+    },
+    "multimodal": {
+      "coding": 1,
+      "general": 1,
+      "multimodal": 4
+    }
+  },
+  "expected_distribution": {
+    "coding": 9,
+    "general": 10,
+    "multimodal": 6
+  },
+  "actual_distribution": {
+    "coding": 10,
+    "general": 10,
+    "multimodal": 5
+  },
+  "results": [
+    {
+      "key": "binary_search",
+      "prompt": "Write a Python function that implements binary search on a sorted array",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0185,
+        "reasoning": 0.0155,
+        "domain_knowledge": 0.6592,
+        "contextual_knowledge": 0.0285,
+        "constraint_ct": 0.0041,
+        "prompt_complexity_score": 0.19516,
+        "number_of_few_shots": 1.6779
+      },
+      "analysis": "Pure coding task"
+    },
+    {
+      "key": "sql_join",
+      "prompt": "Write a SQL query to join users, orders, and products tables to find the top 10 customers by revenue",
+      "expected": "coding",
+      "got": "general",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.6,
+        "coding": 0.0,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.0056,
+        "reasoning": 0.0382,
+        "domain_knowledge": 0.5794,
+        "contextual_knowledge": 0.0694,
+        "constraint_ct": 0.0093,
+        "prompt_complexity_score": 0.20664,
+        "number_of_few_shots": 2.067
+      },
+      "analysis": "SQL coding"
+    },
+    {
+      "key": "rest_api",
+      "prompt": "Create a FastAPI REST API endpoint with authentication, input validation, and error handling for a blog CRUD system",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Chatbot",
+        "task_type_2": "Open QA",
+        "creativity_scope": 0.005,
+        "reasoning": 0.0111,
+        "domain_knowledge": 0.8896,
+        "contextual_knowledge": 0.0951,
+        "constraint_ct": 0.004,
+        "prompt_complexity_score": 0.154,
+        "number_of_few_shots": 0.2137
+      },
+      "analysis": "API coding"
+    },
+    {
+      "key": "debug_code",
+      "prompt": "Debug this code: def foo(lst): return sum(lst) / len(lst)  # crashes on empty list",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0012,
+        "reasoning": 0.0162,
+        "domain_knowledge": 0.9409,
+        "contextual_knowledge": 0.2658,
+        "constraint_ct": 0.0038,
+        "prompt_complexity_score": 0.1661,
+        "number_of_few_shots": 0.1328
+      },
+      "analysis": "Debugging = coding"
+    },
+    {
+      "key": "leetcode",
+      "prompt": "Given an array of integers, return indices of two numbers that add up to a target. Solve in O(n) time.",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.1
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.0008,
+        "reasoning": 0.0255,
+        "domain_knowledge": 0.8958,
+        "contextual_knowledge": 0.4374,
+        "constraint_ct": 0.0047,
+        "prompt_complexity_score": 0.1636,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Algorithm = coding"
+    },
+    {
+      "key": "react_component",
+      "prompt": "Write a React component that fetches data from an API, handles loading/error states, and renders a list",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.5,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.5,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Chatbot",
+        "task_type_2": "Open QA",
+        "creativity_scope": 0.0123,
+        "reasoning": 0.0134,
+        "domain_knowledge": 0.8519,
+        "contextual_knowledge": 0.0947,
+        "constraint_ct": 0.0053,
+        "prompt_complexity_score": 0.17045,
+        "number_of_few_shots": 0.5897
+      },
+      "analysis": "Web dev = coding"
+    },
+    {
+      "key": "capital_france",
+      "prompt": "What is the capital of France?",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.6,
+        "coding": 0.0,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.0059,
+        "reasoning": 0.0427,
+        "domain_knowledge": 0.7165,
+        "contextual_knowledge": 0.1404,
+        "constraint_ct": 0.0115,
+        "prompt_complexity_score": 0.12896,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Factual Q&A = general"
+    },
+    {
+      "key": "explain_microservices",
+      "prompt": "Explain microservices architecture: pros, cons, and when to use it",
+      "expected": "general",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.0023,
+        "reasoning": 0.0164,
+        "domain_knowledge": 0.8527,
+        "contextual_knowledge": 0.1998,
+        "constraint_ct": 0.0023,
+        "prompt_complexity_score": 0.14314,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Technical explanation = general"
+    },
+    {
+      "key": "ml_vs_dl",
+      "prompt": "Compare machine learning and deep learning \u2014 what are the key differences?",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.6,
+        "coding": 0.0,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0035,
+        "reasoning": 0.0471,
+        "domain_knowledge": 0.8269,
+        "contextual_knowledge": 0.1699,
+        "constraint_ct": 0.0031,
+        "prompt_complexity_score": 0.14599,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Comparison = general"
+    },
+    {
+      "key": "why_sky_blue",
+      "prompt": "Explain why the sky is blue to a 5-year-old",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.6,
+        "coding": 0.0,
+        "multimodal": 0.1
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Closed QA",
+        "creativity_scope": 0.0034,
+        "reasoning": 0.0888,
+        "domain_knowledge": 0.4283,
+        "contextual_knowledge": 0.382,
+        "constraint_ct": 0.0298,
+        "prompt_complexity_score": 0.1112,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Simplified explanation = general"
+    },
+    {
+      "key": "hamlet_summary",
+      "prompt": "Summarize the plot of Hamlet in 3 paragraphs",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.45,
+      "scores": {
+        "general": 0.45,
+        "coding": 0.0,
+        "multimodal": 0.1
+      },
+      "classification": {
+        "task_type_1": "Rewrite",
+        "task_type_2": "Summarization",
+        "creativity_scope": 0.0025,
+        "reasoning": 0.0059,
+        "domain_knowledge": 0.5511,
+        "contextual_knowledge": 0.4649,
+        "constraint_ct": 0.0571,
+        "prompt_complexity_score": 0.11682,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Summarization = general"
+    },
+    {
+      "key": "climate_change",
+      "prompt": "What are the main causes and effects of climate change?",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.6,
+        "coding": 0.0,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.004,
+        "reasoning": 0.0683,
+        "domain_knowledge": 0.8756,
+        "contextual_knowledge": 0.1647,
+        "constraint_ct": 0.0105,
+        "prompt_complexity_score": 0.15963,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Factual explanation = general"
+    },
+    {
+      "key": "programming_joke",
+      "prompt": "Tell me a programming joke",
+      "expected": "general",
+      "got": "multimodal",
+      "confidence": 0.7000000000000001,
+      "scores": {
+        "general": 0.2,
+        "coding": 0.0,
+        "multimodal": 0.7000000000000001
+      },
+      "classification": {
+        "task_type_1": "Text Generation",
+        "task_type_2": "Rewrite",
+        "creativity_scope": 0.0472,
+        "reasoning": 0.009,
+        "domain_knowledge": 0.3074,
+        "contextual_knowledge": 0.0528,
+        "constraint_ct": 0.0049,
+        "prompt_complexity_score": 0.1287,
+        "number_of_few_shots": 1.2089
+      },
+      "analysis": "Joke = general (casual)"
+    },
+    {
+      "key": "python_vs_java",
+      "prompt": "Compare Python and Java for backend development",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.5,
+      "scores": {
+        "general": 0.44999999999999996,
+        "coding": 0.5,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "NA",
+        "creativity_scope": 0.0224,
+        "reasoning": 0.0206,
+        "domain_knowledge": 0.7098,
+        "contextual_knowledge": 0.0345,
+        "constraint_ct": 0.0088,
+        "prompt_complexity_score": 0.14874,
+        "number_of_few_shots": 0.5247
+      },
+      "analysis": "Technical comparison = coding or general"
+    },
+    {
+      "key": "poem_sea",
+      "prompt": "Write a poem about the sea",
+      "expected": "multimodal",
+      "got": "multimodal",
+      "confidence": 0.8500000000000001,
+      "scores": {
+        "general": 0.2,
+        "coding": 0.0,
+        "multimodal": 0.8500000000000001
+      },
+      "classification": {
+        "task_type_1": "Text Generation",
+        "task_type_2": "Open QA",
+        "creativity_scope": 0.2494,
+        "reasoning": 0.0084,
+        "domain_knowledge": 0.4169,
+        "contextual_knowledge": 0.1167,
+        "constraint_ct": 0.0296,
+        "prompt_complexity_score": 0.19379,
+        "number_of_few_shots": 0.6319
+      },
+      "analysis": "Creative writing = multimodal"
+    },
+    {
+      "key": "short_story",
+      "prompt": "Write a short story about a robot that learns to paint",
+      "expected": "multimodal",
+      "got": "general",
+      "confidence": 0.44999999999999996,
+      "scores": {
+        "general": 0.44999999999999996,
+        "coding": 0.0,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0266,
+        "reasoning": 0.0184,
+        "domain_knowledge": 0.5683,
+        "contextual_knowledge": 0.0559,
+        "constraint_ct": 0.0057,
+        "prompt_complexity_score": 0.1806,
+        "number_of_few_shots": 1.5558
+      },
+      "analysis": "Creative writing = multimodal"
+    },
+    {
+      "key": "marketing_slogan",
+      "prompt": "Create a marketing slogan for a new eco-friendly water bottle brand",
+      "expected": "multimodal",
+      "got": "multimodal",
+      "confidence": 0.5,
+      "scores": {
+        "general": 0.35,
+        "coding": 0.0,
+        "multimodal": 0.5
+      },
+      "classification": {
+        "task_type_1": "Rewrite",
+        "task_type_2": "Text Generation",
+        "creativity_scope": 0.0717,
+        "reasoning": 0.0055,
+        "domain_knowledge": 0.5387,
+        "contextual_knowledge": 0.0818,
+        "constraint_ct": 0.0227,
+        "prompt_complexity_score": 0.16545,
+        "number_of_few_shots": 1.0136
+      },
+      "analysis": "Creative marketing = multimodal"
+    },
+    {
+      "key": "song_lyrics",
+      "prompt": "Write song lyrics about overcoming challenges",
+      "expected": "multimodal",
+      "got": "multimodal",
+      "confidence": 0.65,
+      "scores": {
+        "general": 0.35,
+        "coding": 0.0,
+        "multimodal": 0.65
+      },
+      "classification": {
+        "task_type_1": "Text Generation",
+        "task_type_2": "Rewrite",
+        "creativity_scope": 0.1086,
+        "reasoning": 0.0044,
+        "domain_knowledge": 0.5104,
+        "contextual_knowledge": 0.0276,
+        "constraint_ct": 0.0031,
+        "prompt_complexity_score": 0.12651,
+        "number_of_few_shots": 0.1799
+      },
+      "analysis": "Creative writing = multimodal"
+    },
+    {
+      "key": "blog_intro",
+      "prompt": "Write an engaging introduction for a blog post about remote work productivity",
+      "expected": "multimodal",
+      "got": "multimodal",
+      "confidence": 0.5,
+      "scores": {
+        "general": 0.44999999999999996,
+        "coding": 0.0,
+        "multimodal": 0.5
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Text Generation",
+        "creativity_scope": 0.0578,
+        "reasoning": 0.0159,
+        "domain_knowledge": 0.5123,
+        "contextual_knowledge": 0.0264,
+        "constraint_ct": 0.005,
+        "prompt_complexity_score": 0.19301,
+        "number_of_few_shots": 1.7979
+      },
+      "analysis": "Creative writing = multimodal"
+    },
+    {
+      "key": "script_dialogue",
+      "prompt": "Write a short dialogue between two friends reuniting after 10 years",
+      "expected": "multimodal",
+      "got": "coding",
+      "confidence": 0.30000000000000004,
+      "scores": {
+        "general": 0.2,
+        "coding": 0.30000000000000004,
+        "multimodal": 0.0
+      },
+      "classification": {
+        "task_type_1": "Rewrite",
+        "task_type_2": "Open QA",
+        "creativity_scope": 0.0177,
+        "reasoning": 0.0062,
+        "domain_knowledge": 0.3193,
+        "contextual_knowledge": 0.0152,
+        "constraint_ct": 0.0027,
+        "prompt_complexity_score": 0.09795,
+        "number_of_few_shots": 0.823
+      },
+      "analysis": "Creative dialogue = multimodal"
+    },
+    {
+      "key": "travel_plan",
+      "prompt": "Plan a 3-day itinerary for Paris including museums, restaurants, and parks",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.30000000000000004,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.2,
+        "multimodal": 0.1
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0074,
+        "reasoning": 0.0253,
+        "domain_knowledge": 0.376,
+        "contextual_knowledge": 0.5223,
+        "constraint_ct": 0.0072,
+        "prompt_complexity_score": 0.09251,
+        "number_of_few_shots": 0
+      },
+      "analysis": "Planning but factual = general"
+    },
+    {
+      "key": "recipe",
+      "prompt": "Give me a recipe for chocolate chip cookies",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.30000000000000004,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.30000000000000004,
+        "multimodal": 0.15
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Rewrite",
+        "creativity_scope": 0.0185,
+        "reasoning": 0.0188,
+        "domain_knowledge": 0.3669,
+        "contextual_knowledge": 0.0449,
+        "constraint_ct": 0.004,
+        "prompt_complexity_score": 0.13001,
+        "number_of_few_shots": 1.2191
+      },
+      "analysis": "Instructional = general"
+    },
+    {
+      "key": "workout_plan",
+      "prompt": "Create a weekly workout plan for beginners",
+      "expected": "general",
+      "got": "general",
+      "confidence": 0.30000000000000004,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.0,
+        "multimodal": 0.2
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Chatbot",
+        "creativity_scope": 0.0383,
+        "reasoning": 0.007,
+        "domain_knowledge": 0.4439,
+        "contextual_knowledge": 0.0498,
+        "constraint_ct": 0.0061,
+        "prompt_complexity_score": 0.09771,
+        "number_of_few_shots": 0.2513
+      },
+      "analysis": "Structured plan = general"
+    },
+    {
+      "key": "interview_questions",
+      "prompt": "List 5 common JavaScript interview questions with answers",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.5,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.5,
+        "multimodal": 0.15
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Brainstorming",
+        "creativity_scope": 0.0065,
+        "reasoning": 0.0118,
+        "domain_knowledge": 0.4038,
+        "contextual_knowledge": 0.0654,
+        "constraint_ct": 0.0048,
+        "prompt_complexity_score": 0.06978,
+        "number_of_few_shots": 0
+      },
+      "analysis": "JS questions = coding"
+    },
+    {
+      "key": "data_analysis_prompt",
+      "prompt": "Analyze this CSV data and tell me the trends: sales, region, quarter",
+      "expected": "coding",
+      "got": "coding",
+      "confidence": 0.6,
+      "scores": {
+        "general": 0.30000000000000004,
+        "coding": 0.6,
+        "multimodal": 0.15
+      },
+      "classification": {
+        "task_type_1": "Open QA",
+        "task_type_2": "Rewrite",
+        "creativity_scope": 0.0167,
+        "reasoning": 0.0133,
+        "domain_knowledge": 0.6036,
+        "contextual_knowledge": 0.0539,
+        "constraint_ct": 0.0046,
+        "prompt_complexity_score": 0.14389,
+        "number_of_few_shots": 0.8159
+      },
+      "analysis": "Data analysis code = coding"
+    }
+  ]
+}

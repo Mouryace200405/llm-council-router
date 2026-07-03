@@ -29,14 +29,14 @@ EXPERT_MODELS: Dict[str, Dict] = {
     "multimodal": {
         "model_id": "Qwen/Qwen3.5-9B",
         "provider": "together",
-        "description": "Vision, RAG, planning, tool-use, long context, thinking",
+        "description": "Creative/long-form text, brainstorming, rewriting (NOTE: text-only — no actual vision/RAG; uses Qwen3.5-9B for creative text tasks)",
         "method": "openai",
     },
     "general": {
         "model_id": "meta-llama/Llama-3.1-8B-Instruct",
-        "provider": None,
+        "provider": "nscale",
         "description": "General-purpose writing, QA, summarization, default fallback",
-        "method": "inference_client",
+        "method": "openai",
     },
 }
 

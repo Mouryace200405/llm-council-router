@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 """
 LLM Council Router — Gradio Research Dashboard
------------------------------------------------
-Provides full pipeline visibility:
-  - Stage-by-stage view (raw prompt → enhanced → classified → routed → inferred)
-  - Side-by-side comparison of Council, Majority Vote, and Dictatorship modes
-  - Real-time metrics: latency, energy, quality scores, hallucination estimates
-  - Confusion matrix and statistical comparison tables
-
-Usage:
-    python app/gradio_app.py
 """
 
 import json
@@ -56,99 +47,85 @@ RESEARCH_PROMPTS = [
 ]
 
 
-def build_pipeline_visual(
-    prompt: str,
-    enriched: str,
-    cls,
-    decision,
-    response_text: str,
-    expert_key: str,
-) -> str:
-    """Build a visual trace of the full pipeline."""
+def build_pipeline_visual(prompt, enriched, cls, decision, response_text, expert_key):
     lines = []
     lines.append("=" * 60)
     lines.append("PIPELINE STAGE-BY-STAGE TRACE")
     lines.append("=" * 60)
-
-    lines.append("\n[1] RAW PROMPT")
-    lines.append(f"  {prompt}")
-
-    lines.append(f"\n[2] ENHANCED PROMPT (via LFM2.5-Prompt-Enhancer)")
-    lines.append(f"  {enriched}")
-
-    lines.append(f"\n[3] CLASSIFICATION (via NVIDIA Prompt Classifier)")
-    lines.append(f"  Task Type (Primary):    {cls.task_type_1}")
-    lines.append(f"  Task Type (Secondary):  {cls.task_type_2}")
-    lines.append(f"  Confidence:             {cls.task_type_prob:.3f}")
-    lines.append(f"  Complexity Score:       {cls.prompt_complexity_score:.3f}")
-    lines.append(f"  Reasoning:              {cls.reasoning:.3f}")
-    lines.append(f"  Creativity:             {cls.creativity_scope:.3f}")
-    lines.append(f"  Domain Knowledge:       {cls.domain_knowledge:.3f}")
-    lines.append(f"  Contextual Knowledge:   {cls.contextual_knowledge:.3f}")
-    lines.append(f"  Constraints:            {cls.constraint_ct:.3f}")
-    lines.append(f"  Few-Shot Count:         {cls.number_of_few_shots:.3f}")
-
-    lines.append(f"\n[4] ROUTING (via Lightweight Router)")
-    for expert in ["coding", "multimodal", "general"]:
-        score = decision.scores.get(expert, 0)
-        label = f"  {expert:<12s} score={score:.3f}"
-        if expert == decision.selected_expert:
-            label += "  <-- SELECTED"
-        lines.append(label)
-    for reason in decision.reasons:
-        lines.append(f"  Reason: {reason}")
-
-    lines.append(f"\n[5] INFERENCE (via {expert_key} → {EXPERT_MODELS[expert_key]['model_id']})")
+    lines.append(f"\n[1] RAW PROMPT\n  {prompt}")
+    lines.append(f"\n[2] ENHANCED PROMPT\n  {enriched}")
+    lines.append(f"\n[3] CLASSIFICATION (NVIDIA Prompt Classifier)")
+    if cls:
+        lines.append(f"  Task Type:         {cls.task_type_1} / {cls.task_type_2}")
+        lines.append(f"  Confidence:        {cls.task_type_prob:.3f}")
+        lines.append(f"  Complexity:        {cls.prompt_complexity_score:.3f}")
+        lines.append(f"  Reasoning:         {cls.reasoning:.3f}")
+        lines.append(f"  Creativity:        {cls.creativity_scope:.3f}")
+        lines.append(f"  Domain Knowledge:  {cls.domain_knowledge:.3f}")
+        lines.append(f"  Contextual Know:   {cls.contextual_knowledge:.3f}")
+        lines.append(f"  Constraints:       {cls.constraint_ct:.3f}")
+        lines.append(f"  Few-Shot Count:    {cls.number_of_few_shots:.3f}")
+    lines.append(f"\n[4] ROUTING (Lightweight Router)")
+    if decision:
+        for expert in ["coding", "multimodal", "general"]:
+            score = decision.scores.get(expert, 0)
+            label = f"  {expert:<12s} score={score:.3f}"
+            if expert == decision.selected_expert:
+                label += "  <-- SELECTED"
+            lines.append(label)
+        for reason in decision.reasons:
+            lines.append(f"  Reason: {reason}")
+    lines.append(f"\n[5] INFERENCE")
+    lines.append(f"  Model: {expert_key} -> {EXPERT_MODELS.get(expert_key, {}).get('model_id', 'N/A')}")
     lines.append(f"  {response_text[:600]}")
-
     return "\n".join(lines)
 
 
-def build_comparison_table(cr) -> str:
-    """Build side-by-side comparison of the three modes."""
-    rows = []
-    rows.append(f"{'Metric':<30} {'Council':<25} {'Majority Vote':<25} {'Dictatorship':<25}")
-    rows.append("-" * 105)
-    rows.append(f"{'Selected Expert':<30} {cr.council_expert or 'N/A':<25} "
-                f"{cr.majority_vote_result or 'N/A':<25} {cr.dictator_chosen_expert or 'N/A':<25}")
-    rows.append(f"{'Latency (ms)':<30} {cr.council_latency:<25.1f} "
-                f"{cr.voting_latency:<25.1f} {cr.dictatorship_latency:<25.1f}")
-    if cr.classification:
-        rows.append(f"{'Task Type':<30} {cr.classification.task_type_1:<25} - -")
-        rows.append(f"{'Complexity':<30} {cr.classification.prompt_complexity_score:<25.3f} - -")
+def build_comparison_table(cr):
+    if not cr:
+        return "No comparison data available."
 
-    rows.append(f"\n{'Response Quality':<30} {'Council':<25} {'Majority':<25} {'Dictator':<25}")
-    rows.append("-" * 105)
+    rows = []
+    rows.append(f"{'Metric':<30} {'Council':<30} {'Majority Vote':<30} {'Dictatorship':<30}")
+    rows.append("-" * 120)
+    rows.append(f"{'Selected Expert':<30} {cr.council_expert or 'N/A':<30} "
+                f"{cr.majority_vote_result or 'N/A':<30} {cr.dictator_chosen_expert or 'N/A':<30}")
+    rows.append(f"{'Latency (ms)':<30} {cr.council_latency:<30.1f} "
+                f"{cr.voting_latency:<30.1f} {cr.dictatorship_latency:<30.1f}")
+    if cr.classification:
+        rows.append(f"{'Task Type':<30} {cr.classification.task_type_1:<30} - -")
+        rows.append(f"{'Complexity':<30} {cr.classification.prompt_complexity_score:<30.3f} - -")
 
     def _resp_text(obj):
         if hasattr(obj, "text"):
             return obj.text
         return str(obj) if obj else ""
 
-    texts = {"Council": _resp_text(cr.council_response),
-             "Majority": _resp_text(cr.all_responses.get(cr.majority_vote_result or "")),
-             "Dictator": _resp_text(cr.dictator_response)}
+    council_t = _resp_text(cr.council_response)
+    majority_key = cr.majority_vote_result or ""
+    majority_t = _resp_text(cr.all_responses.get(majority_key, ""))
+    dictator_key = cr.dictator_chosen_expert or ""
+    dictator_t = _resp_text(cr.all_responses.get(dictator_key, ""))
 
-    for name in ["Council", "Majority", "Dictator"]:
-        t = texts.get(name, "")
-        qual = response_quality_score(t, cr.prompt)
-        hall = hallucination_heuristic(t, cr.prompt)
-        vocab = vocabulary_richness(t)
-    rows.append(f"{'Quality Score':<30} {response_quality_score(texts['Council'], cr.prompt):<25.3f} "
-                f"{response_quality_score(texts['Majority'], cr.prompt):<25.3f} "
-                f"{response_quality_score(texts['Dictator'], cr.prompt):<25.3f}")
-    rows.append(f"{'Hallucination Risk':<30} {hallucination_heuristic(texts['Council'], cr.prompt):<25.3f} "
-                f"{hallucination_heuristic(texts['Majority'], cr.prompt):<25.3f} "
-                f"{hallucination_heuristic(texts['Dictator'], cr.prompt):<25.3f}")
-    rows.append(f"{'Vocab Richness':<30} {vocabulary_richness(texts['Council']):<25.3f} "
-                f"{vocabulary_richness(texts['Majority']):<25.3f} "
-                f"{vocabulary_richness(texts['Dictator']):<25.3f}")
+    rows.append(f"\n{'Response Quality':<30} {'Council':<30} {'Majority':<30} {'Dictator':<30}")
+    rows.append("-" * 120)
+    rows.append(f"{'Quality Score':<30} {response_quality_score(council_t, cr.prompt):<30.3f} "
+                f"{response_quality_score(majority_t, cr.prompt):<30.3f} "
+                f"{response_quality_score(dictator_t, cr.prompt):<30.3f}")
+    rows.append(f"{'Hallucination Risk':<30} {hallucination_heuristic(council_t, cr.prompt):<30.3f} "
+                f"{hallucination_heuristic(majority_t, cr.prompt):<30.3f} "
+                f"{hallucination_heuristic(dictator_t, cr.prompt):<30.3f}")
+    rows.append(f"{'Vocab Richness':<30} {vocabulary_richness(council_t):<30.3f} "
+                f"{vocabulary_richness(majority_t):<30.3f} "
+                f"{vocabulary_richness(dictator_t):<30.3f}")
 
     return "\n".join(rows)
 
 
-def format_all_responses(cr) -> str:
-    """Show what each model said."""
+def format_all_responses(cr):
+    if not cr:
+        return "No response data available."
+
     lines = []
     for expert in ALL_EXPERTS:
         resp = cr.all_responses.get(expert)
@@ -160,6 +137,16 @@ def format_all_responses(cr) -> str:
         lines.append(f"=== COUNCIL SELECTED ({cr.council_expert}) ===")
         lines.append(cr.council_response.text[:400])
         lines.append("")
+    if cr.dictator_chosen_expert:
+        chosen_resp = cr.all_responses.get(cr.dictator_chosen_expert, None)
+        if chosen_resp:
+            lines.append(f"=== DICTATOR CHOSEN ({cr.dictator_chosen_expert}) ===")
+            lines.append(chosen_resp.text[:400])
+            lines.append("")
+        else:
+            lines.append(f"=== DICTATOR CHOSEN ({cr.dictator_chosen_expert}) ===")
+            lines.append("(response not available)")
+            lines.append("")
     return "\n".join(lines)
 
 
@@ -167,13 +154,16 @@ def format_all_responses(cr) -> str:
 # Global state
 # ===================================================================
 runner = None
-history_metrics = {"council": [], "majority": [], "dictator": []}
 
 
 def ensure_runner():
     global runner
     if runner is None:
-        runner = ComparisonRunner(use_dummy=True)
+        use_live = "--live" in sys.argv
+        mode = "LIVE" if use_live else "dummy"
+        logger.info("Initializing ComparisonRunner (%s mode)...", mode)
+        runner = ComparisonRunner(use_dummy=not use_live)
+        logger.info("ComparisonRunner ready.")
     return runner
 
 
@@ -181,51 +171,82 @@ def ensure_runner():
 # Gradio handlers
 # ===================================================================
 
-def process_prompt(prompt: str) -> Tuple[str, str, str, str, str]:
-    """Handle single-prompt processing."""
-    r = ensure_runner()
-    cr = r.run_comparison(prompt)
+def on_submit(prompt_text, mode_choice):
+    if not prompt_text.strip():
+        return ("Please enter a prompt.", "", "", "", "—", "—",
+                "—", "— ms", "—", "— ms", "—", "— ms")
 
-    trace = build_pipeline_visual(
-        cr.prompt, cr.enriched,
-        cr.classification, cr.routing,
-        cr.council_response.text if cr.council_response else "",
-        cr.council_expert or "N/A",
-    )
-    comparison = build_comparison_table(cr)
-    responses = format_all_responses(cr)
+    try:
+        mode_map = {
+            "Council": "council",
+            "Majority Voting": "voting",
+            "Dictatorship": "dictator",
+            "All Three": "all",
+        }
+        r = ensure_runner()
+        cr = r.run_comparison(prompt_text, mode=mode_map.get(mode_choice, "all"))
 
-    # Metrics summary
-    metrics_lines = []
-    metrics_lines.append(f"Total Energy: {cr.energy.total_energy_j:.4f} J" if cr.energy else "Energy: N/A (dummy mode)")
-    metrics_lines.append(f"Council Latency: {cr.council_latency:.1f} ms")
-    metrics_lines.append(f"Voting Latency:  {cr.voting_latency:.1f} ms")
-    metrics_lines.append(f"Dictator Latency: {cr.dictatorship_latency:.1f} ms")
-    metrics_str = "\n".join(metrics_lines)
+        trace = build_pipeline_visual(
+            cr.prompt, cr.enriched,
+            cr.classification, cr.routing,
+            cr.council_response.text if cr.council_response else "",
+            cr.council_expert or "—",
+        )
 
-    return trace, comparison, responses, metrics_str, cr.enriched
+        show_full = mode_choice == "All Three"
+        comparison = build_comparison_table(cr) if show_full else "Select 'All Three' to see comparison"
+        responses = format_all_responses(cr) if show_full else "Select 'All Three' to see all responses"
+
+        task_type = cr.classification.task_type_1 if cr.classification else "—"
+        complexity = f"{cr.classification.prompt_complexity_score:.3f}" if cr.classification else "—"
+
+        council_exp = cr.council_expert or "—"
+        council_lat = f"{cr.council_latency:.1f} ms" if cr.council_latency > 0 else "—"
+        maj_exp = cr.majority_vote_result or "—"
+        maj_lat = f"{cr.voting_latency:.1f} ms" if cr.voting_latency > 0 else "—"
+        dict_exp = cr.dictator_chosen_expert or "—"
+        dict_lat = f"{cr.dictatorship_latency:.1f} ms" if cr.dictatorship_latency > 0 else "—"
+
+        return (
+            trace, comparison, responses, cr.enriched,
+            task_type, complexity,
+            council_exp, council_lat,
+            maj_exp, maj_lat,
+            dict_exp, dict_lat,
+        )
+    except Exception as e:
+        logger.error("Error processing prompt: %s", e)
+        return (f"Error: {e}", "", "", "", "—", "—",
+                "—", "— ms", "—", "— ms", "—", "— ms")
 
 
-def run_benchmark() -> str:
-    """Run benchmark over all research prompts and compute aggregate metrics."""
-    from src.utils.research_metrics import ResearchEvaluator, ModeMetrics
+def run_benchmark():
+    from src.utils.research_metrics import ResearchEvaluator
 
     r = ensure_runner()
     evaluator = ResearchEvaluator()
     all_records = []
 
-    for prompt in RESEARCH_PROMPTS:
-        cr = r.run_comparison(prompt)
-        all_records.append(cr)
+    for i, prompt in enumerate(RESEARCH_PROMPTS):
+        try:
+            cr = r.run_comparison(prompt, mode="all")
+            all_records.append(cr)
+        except Exception as e:
+            logger.error("Benchmark failed at prompt %d: %s", i, e)
 
-    # Build mode-specific prediction lists
-    council = [(cr.council_expert or "general", cr.council_latency, cr.council_response.text or "")
-               for cr in all_records]
+    if not all_records:
+        return "Benchmark failed — no records collected."
+
+    council = [(cr.council_expert or "general", cr.council_latency,
+                cr.council_response.text or "") for cr in all_records]
     majority = [(cr.majority_vote_result or "general", cr.voting_latency,
-                 cr.all_responses.get(cr.majority_vote_result or "", None))
+                 cr.all_responses.get(cr.majority_vote_result or "", ""))
                 for cr in all_records]
     majority = [(e, l, (t.text if hasattr(t, 'text') else str(t) if t else "")) for e, l, t in majority]
-    dictator = [(cr.dictator_chosen_expert or "general", cr.dictatorship_latency, cr.dictator_response.text or "")
+    dictator = [(cr.dictator_chosen_expert or "general", cr.dictatorship_latency,
+                 cr.all_responses.get(cr.dictator_chosen_expert or "", "").text
+                 if isinstance(cr.all_responses.get(cr.dictator_chosen_expert or ""), type(cr.council_response))
+                 else str(cr.all_responses.get(cr.dictator_chosen_expert or "", "")))
                 for cr in all_records]
 
     cm = evaluator.compute_mode_metrics(council)
@@ -237,7 +258,7 @@ def run_benchmark() -> str:
 
     lines = []
     lines.append("=" * 70)
-    lines.append("BENCHMARK RESULTS (over {} prompts)".format(len(RESEARCH_PROMPTS)))
+    lines.append(f"BENCHMARK RESULTS ({len(all_records)} prompts)")
     lines.append("=" * 70)
     for m in [cm, mm, dm]:
         lines.append(f"\n--- {m.name} ---")
@@ -254,49 +275,22 @@ def run_benchmark() -> str:
     return "\n".join(lines)
 
 
-def live_update(prompt: str) -> Dict:
-    """Return metrics as JSON for the live dashboard."""
-    r = ensure_runner()
-    cr = r.run_comparison(prompt)
-
-    return {
-        "council_expert": cr.council_expert,
-        "majority_expert": cr.majority_vote_result,
-        "dictator_expert": cr.dictator_chosen_expert,
-        "council_latency": round(cr.council_latency, 1),
-        "voting_latency": round(cr.voting_latency, 1),
-        "dictator_latency": round(cr.dictatorship_latency, 1),
-        "complexity": round(cr.classification.prompt_complexity_score, 3) if cr.classification else 0,
-        "task_type": cr.classification.task_type_1 if cr.classification else "N/A",
-    }
-
-
 # ===================================================================
 # Build Gradio UI
 # ===================================================================
 
-
-CSS = """
-.pipeline-trace { font-family: 'Courier New', monospace; font-size: 13px; }
-.metric-card { background: #f0f4ff; border-radius: 8px; padding: 12px; }
-"""
-
 def create_ui():
-    with gr.Blocks(
-        title="LLM Council Router — Research Dashboard",
-    ) as demo:
+    with gr.Blocks(title="LLM Council Router — Research Dashboard") as demo:
         gr.Markdown(
             """
-            # 🤖 LLM Council Router — Research Dashboard
+            # LLM Council Router — Research Dashboard
             ### Intelligent Prompt Routing with 3-Expert LLM Council
 
             This dashboard shows **every stage** of the routing pipeline and compares
-            **three routing paradigms** for your research paper:
+            **three routing paradigms**:
             - **Council Mode** (intelligent enhance → classify → route → infer)
             - **Majority Voting** (all 3 models respond, majority decides)
             - **Dictatorship** (all 3 respond, judge picks best)
-
-            ---
             """
         )
 
@@ -315,110 +309,73 @@ def create_ui():
                 )
 
         with gr.Row():
-            submit_btn = gr.Button("🚀 Run Pipeline", variant="primary", scale=2)
-            benchmark_btn = gr.Button("📊 Run Benchmark (12 prompts)", scale=2)
+            submit_btn = gr.Button("Run Pipeline", variant="primary", scale=2)
+            benchmark_btn = gr.Button("Run Benchmark (12 prompts)", scale=2)
 
-        # --- Stage-by-stage pipeline trace ---
+        # Pipeline trace
         with gr.Row():
             with gr.Column():
-                gr.Markdown("## 🔍 Pipeline Stage-by-Stage Trace")
+                gr.Markdown("## Pipeline Stage-by-Stage Trace")
                 pipeline_trace = gr.Textbox(
                     label="",
-                    lines=30,
+                    lines=25,
                     max_lines=40,
-                    elem_classes=["pipeline-trace"],
                 )
 
-        # --- Live metrics cards ---
+        # Live metrics
         with gr.Row():
             with gr.Column():
-                gr.Markdown("## ⚡ Real-Time Metrics")
+                gr.Markdown("## Real-Time Metrics")
             with gr.Column():
                 enhanced_output = gr.Textbox(label="Enhanced Prompt", lines=1)
 
         with gr.Row():
-            with gr.Column(scale=1, elem_classes=["metric-card"]):
+            with gr.Column(scale=1):
                 task_type_display = gr.Textbox(label="Task Type", value="—")
                 complexity_display = gr.Textbox(label="Complexity", value="—")
-            with gr.Column(scale=1, elem_classes=["metric-card"]):
-                council_expert_display = gr.Textbox(label="Council → Expert", value="—")
+            with gr.Column(scale=1):
+                council_expert_display = gr.Textbox(label="Council Expert", value="—")
                 council_latency_display = gr.Textbox(label="Council Latency", value="— ms")
-            with gr.Column(scale=1, elem_classes=["metric-card"]):
-                majority_expert_display = gr.Textbox(label="Majority → Winner", value="—")
+            with gr.Column(scale=1):
+                majority_expert_display = gr.Textbox(label="Majority Winner", value="—")
                 voting_latency_display = gr.Textbox(label="Voting Latency", value="— ms")
-            with gr.Column(scale=1, elem_classes=["metric-card"]):
-                dictator_expert_display = gr.Textbox(label="Dictator → Chosen", value="—")
+            with gr.Column(scale=1):
+                dictator_expert_display = gr.Textbox(label="Dictator Chosen", value="—")
                 dictator_latency_display = gr.Textbox(label="Dictator Latency", value="— ms")
 
-        # --- Side-by-side comparison ---
+        # Side-by-side comparison
         with gr.Row():
             with gr.Column():
-                gr.Markdown("## 📊 Mode Comparison")
+                gr.Markdown("## Mode Comparison")
                 comparison_output = gr.Textbox(
                     label="Council vs Majority vs Dictatorship",
-                    lines=18,
+                    lines=15,
                     max_lines=25,
                 )
 
-        # --- All model responses ---
+        # All model responses
         with gr.Row():
             with gr.Column():
-                gr.Markdown("## 💬 All Expert Responses")
+                gr.Markdown("## All Expert Responses")
                 responses_output = gr.Textbox(
                     label="What each model said",
-                    lines=20,
+                    lines=18,
                     max_lines=30,
                 )
 
-        # --- Benchmark output ---
+        # Benchmark output
         with gr.Row():
             benchmark_output = gr.Textbox(
                 label="Benchmark Results",
-                lines=20,
+                lines=18,
                 max_lines=30,
-                visible=True,
             )
 
         # ================================================================
         # Event handlers
         # ================================================================
 
-        def on_submit(prompt_text, mode_choice):
-            if not prompt_text.strip():
-                return (
-                    "Please enter a prompt.", "", "", "", "—", "—",
-                    "—", "— ms", "—", "— ms", "—", "— ms",
-                )
-
-            r = ensure_runner()
-            cr = r.run_comparison(prompt_text)
-
-            trace = build_pipeline_visual(
-                cr.prompt, cr.enriched,
-                cr.classification, cr.routing,
-                cr.council_response.text if cr.council_response else "",
-                cr.council_expert or "—",
-            )
-
-            comparison = build_comparison_table(cr) if mode_choice == "All Three" else "Select 'All Three' to see comparison"
-            responses = format_all_responses(cr) if mode_choice == "All Three" else "Select 'All Three' to see all responses"
-
-            task_type = cr.classification.task_type_1 if cr.classification else "—"
-            complexity = f"{cr.classification.prompt_complexity_score:.3f}" if cr.classification else "—"
-
-            return (
-                trace, comparison, responses, cr.enriched,
-                task_type, complexity,
-                cr.council_expert or "—", f"{cr.council_latency:.1f} ms",
-                cr.majority_vote_result or "—", f"{cr.voting_latency:.1f} ms",
-                cr.dictator_chosen_expert or "—", f"{cr.dictatorship_latency:.1f} ms",
-            )
-
-        def on_benchmark():
-            result = run_benchmark()
-            return result
-
-        submit_event = submit_btn.click(
+        submit_btn.click(
             fn=on_submit,
             inputs=[prompt_input, mode],
             outputs=[
@@ -438,21 +395,22 @@ def create_ui():
         )
 
         benchmark_btn.click(
-            fn=on_benchmark,
+            fn=run_benchmark,
             inputs=[],
             outputs=[benchmark_output],
         )
 
+        mode_status = "LIVE (HF Inference API)" if "--live" in sys.argv else "DUMMY (simulated)"
         gr.Markdown(
-            """
+            f"""
             ---
             **Architecture:**
-            - 🧠 *Prompt Enhancer*: LFM2.5 (local) rewrites raw prompts
-            - 📐 *Classifier*: NVIDIA DeBERTa-v3 (local) scores 10 dimensions
-            - 🔀 *Router*: Lightweight heuristic scorer (no model loaded)
-            - ⚡ *Experts*: Qwen2.5-Coder-7B | Qwen3.5-9B | Llama-3.1-8B (HF cloud)
+            - Prompt Enhancer: LFM2.5 (local) rewrites raw prompts
+            - Classifier: NVIDIA DeBERTa-v3 (local) scores 10 dimensions
+            - Router: Pure classifier-based scorer (no model loaded)
+            - Experts: Qwen2.5-Coder-7B | Qwen3.5-9B | Llama-3.1-8B
 
-            **Built for IEEE-style research evaluation.**
+            **Status:** {mode_status}
             """
         )
 
@@ -468,13 +426,23 @@ def main():
         print("ERROR: gradio not installed. Run: pip install gradio")
         sys.exit(1)
 
+    global runner
+    use_live = "--live" in sys.argv
+
+    if use_live:
+        print("LIVE mode — using HF Inference API for model responses")
+        runner = ComparisonRunner(use_dummy=False)
+    else:
+        print("Dummy mode — simulated responses (use --live for real models)")
+        runner = ComparisonRunner(use_dummy=True)
+
+    print("Models ready. Launching dashboard...")
+
     demo = create_ui()
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
-        theme=gr.themes.Soft(),
-        css=CSS,
     )
 
 
