@@ -1,0 +1,502 @@
+[
+  {
+    "prompt": "Write a Python function to implement binary search",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12345314025879,
+    "voting_latency_ms": 150.31695365905762,
+    "dictatorship_latency_ms": 200.75035095214844,
+    "task_type": "Unknown",
+    "complexity": 0.64388,
+    "council_response": "[CODING simulation] Processed: Write a Python function that implements binary search to find a target value wit...",
+    "majority_response": "[CODING simulation] Processed: Write a Python function that implements binary search to find a target value wit...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Write a Python function that implements binary search to find a target value wit...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Write a Python function that implements binary search to find a target value wit...",
+      "general": "[GENERAL simulation] Processed: Write a Python function that implements binary search to find a target value wit..."
+    }
+  },
+  {
+    "prompt": "Debug this code: def foo(x): return x / 0",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12083053588867,
+    "voting_latency_ms": 150.29215812683105,
+    "dictatorship_latency_ms": 200.9282112121582,
+    "task_type": "Unknown",
+    "complexity": 0.56995,
+    "council_response": "[CODING simulation] Processed: Analyze the function 'foo' and identify the division by zero error. Suggest a fi...",
+    "majority_response": "[CODING simulation] Processed: Analyze the function 'foo' and identify the division by zero error. Suggest a fi...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Analyze the function 'foo' and identify the division by zero error. Suggest a fi...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Analyze the function 'foo' and identify the division by zero error. Suggest a fi...",
+      "general": "[GENERAL simulation] Processed: Analyze the function 'foo' and identify the division by zero error. Suggest a fi..."
+    }
+  },
+  {
+    "prompt": "Write a SQL query to join users and orders tables",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12059211730957,
+    "voting_latency_ms": 150.30860900878906,
+    "dictatorship_latency_ms": 200.7148265838623,
+    "task_type": "Unknown",
+    "complexity": 0.66202,
+    "council_response": "[CODING simulation] Processed: Write a SQL query that joins users and orders tables, showing each user's total ...",
+    "majority_response": "[CODING simulation] Processed: Write a SQL query that joins users and orders tables, showing each user's total ...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Write a SQL query that joins users and orders tables, showing each user's total ...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Write a SQL query that joins users and orders tables, showing each user's total ...",
+      "general": "[GENERAL simulation] Processed: Write a SQL query that joins users and orders tables, showing each user's total ..."
+    }
+  },
+  {
+    "prompt": "Create a REST API endpoint in FastAPI with authentication",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.110578536987305,
+    "voting_latency_ms": 150.29454231262207,
+    "dictatorship_latency_ms": 202.03399658203125,
+    "task_type": "Unknown",
+    "complexity": 0.52329,
+    "council_response": "[CODING simulation] Processed: Build a REST API with: 1) JWT authentication, 2) Rate limiting, 3) POST request ...",
+    "majority_response": "[CODING simulation] Processed: Build a REST API with: 1) JWT authentication, 2) Rate limiting, 3) POST request ...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Build a REST API with: 1) JWT authentication, 2) Rate limiting, 3) POST request ...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Build a REST API with: 1) JWT authentication, 2) Rate limiting, 3) POST request ...",
+      "general": "[GENERAL simulation] Processed: Build a REST API with: 1) JWT authentication, 2) Rate limiting, 3) POST request ..."
+    }
+  },
+  {
+    "prompt": "Implement a React component for a sortable data table",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.11248588562012,
+    "voting_latency_ms": 150.3007411956787,
+    "dictatorship_latency_ms": 201.18379592895508,
+    "task_type": "Unknown",
+    "complexity": 0.60765,
+    "council_response": "[CODING simulation] Processed: Build a React table component with:\n\n1. Sortable columns (with click handlers)\n2...",
+    "majority_response": "[CODING simulation] Processed: Build a React table component with:\n\n1. Sortable columns (with click handlers)\n2...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Build a React table component with:\n\n1. Sortable columns (with click handlers)\n2...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Build a React table component with:\n\n1. Sortable columns (with click handlers)\n2...",
+      "general": "[GENERAL simulation] Processed: Build a React table component with:\n\n1. Sortable columns (with click handlers)\n2..."
+    }
+  },
+  {
+    "prompt": "Refactor this JavaScript callback into async/await",
+    "expected": "coding",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.107717514038086,
+    "voting_latency_ms": 150.3124237060547,
+    "dictatorship_latency_ms": 200.75225830078125,
+    "task_type": "Unknown",
+    "complexity": 0.65946,
+    "council_response": "[CODING simulation] Processed: Convert this async/await version of the file cleanup function....",
+    "majority_response": "[CODING simulation] Processed: Convert this async/await version of the file cleanup function....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Convert this async/await version of the file cleanup function....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Convert this async/await version of the file cleanup function....",
+      "general": "[GENERAL simulation] Processed: Convert this async/await version of the file cleanup function...."
+    }
+  },
+  {
+    "prompt": "Explain the steps to deploy a web application on AWS",
+    "expected": "multimodal",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.1401424407959,
+    "voting_latency_ms": 150.41637420654297,
+    "dictatorship_latency_ms": 201.08366012573242,
+    "task_type": "Unknown",
+    "complexity": 0.65892,
+    "council_response": "[CODING simulation] Processed: Describe the steps to deploy a web application on AWS, including creating an EC2...",
+    "majority_response": "[CODING simulation] Processed: Describe the steps to deploy a web application on AWS, including creating an EC2...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Describe the steps to deploy a web application on AWS, including creating an EC2...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Describe the steps to deploy a web application on AWS, including creating an EC2...",
+      "general": "[GENERAL simulation] Processed: Describe the steps to deploy a web application on AWS, including creating an EC2..."
+    }
+  },
+  {
+    "prompt": "Plan a 3-day itinerary for Paris with budget estimates",
+    "expected": "multimodal",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.11916160583496,
+    "voting_latency_ms": 150.3310203552246,
+    "dictatorship_latency_ms": 201.1697292327881,
+    "task_type": "Unknown",
+    "complexity": 0.6365,
+    "council_response": "[CODING simulation] Processed: Create a 3-day Paris itinerary with budget estimates for accommodation, food, an...",
+    "majority_response": "[CODING simulation] Processed: Create a 3-day Paris itinerary with budget estimates for accommodation, food, an...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Create a 3-day Paris itinerary with budget estimates for accommodation, food, an...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Create a 3-day Paris itinerary with budget estimates for accommodation, food, an...",
+      "general": "[GENERAL simulation] Processed: Create a 3-day Paris itinerary with budget estimates for accommodation, food, an..."
+    }
+  },
+  {
+    "prompt": "What are the pros and cons of microservices architecture",
+    "expected": "multimodal",
+    "council_selected": "multimodal",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.110578536987305,
+    "voting_latency_ms": 150.39706230163574,
+    "dictatorship_latency_ms": 200.42014122009277,
+    "task_type": "Unknown",
+    "complexity": 0.57459,
+    "council_response": "[MULTIMODAL simulation] Processed: Explain the advantages and disadvantages of microservices architecture, includin...",
+    "majority_response": "[CODING simulation] Processed: Explain the advantages and disadvantages of microservices architecture, includin...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Explain the advantages and disadvantages of microservices architecture, includin...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Explain the advantages and disadvantages of microservices architecture, includin...",
+      "general": "[GENERAL simulation] Processed: Explain the advantages and disadvantages of microservices architecture, includin..."
+    }
+  },
+  {
+    "prompt": "Compare machine learning and deep learning approaches",
+    "expected": "multimodal",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.104618072509766,
+    "voting_latency_ms": 150.32434463500977,
+    "dictatorship_latency_ms": 200.61349868774414,
+    "task_type": "Unknown",
+    "complexity": 0.54689,
+    "council_response": "[CODING simulation] Processed: Compare machine learning and deep learning approaches, including their strengths...",
+    "majority_response": "[CODING simulation] Processed: Compare machine learning and deep learning approaches, including their strengths...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Compare machine learning and deep learning approaches, including their strengths...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Compare machine learning and deep learning approaches, including their strengths...",
+      "general": "[GENERAL simulation] Processed: Compare machine learning and deep learning approaches, including their strengths..."
+    }
+  },
+  {
+    "prompt": "Analyze the environmental impact of electric vehicles",
+    "expected": "multimodal",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12011528015137,
+    "voting_latency_ms": 150.32410621643066,
+    "dictatorship_latency_ms": 200.66022872924805,
+    "task_type": "Unknown",
+    "complexity": 0.59343,
+    "council_response": "[CODING simulation] Processed: Analyze the environmental impact of electric vehicles, including their carbon fo...",
+    "majority_response": "[CODING simulation] Processed: Analyze the environmental impact of electric vehicles, including their carbon fo...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Analyze the environmental impact of electric vehicles, including their carbon fo...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Analyze the environmental impact of electric vehicles, including their carbon fo...",
+      "general": "[GENERAL simulation] Processed: Analyze the environmental impact of electric vehicles, including their carbon fo..."
+    }
+  },
+  {
+    "prompt": "Design a database schema for an e-commerce platform",
+    "expected": "coding",
+    "council_selected": "multimodal",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.126075744628906,
+    "voting_latency_ms": 150.2664089202881,
+    "dictatorship_latency_ms": 200.9434700012207,
+    "task_type": "Open QA",
+    "complexity": 0.59609,
+    "council_response": "[MULTIMODAL simulation] Processed: Create a relational database schema with: 1) Customer table (ID, name, email, ad...",
+    "majority_response": "[CODING simulation] Processed: Create a relational database schema with: 1) Customer table (ID, name, email, ad...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Create a relational database schema with: 1) Customer table (ID, name, email, ad...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Create a relational database schema with: 1) Customer table (ID, name, email, ad...",
+      "general": "[GENERAL simulation] Processed: Create a relational database schema with: 1) Customer table (ID, name, email, ad..."
+    }
+  },
+  {
+    "prompt": "What is the capital of France?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.121307373046875,
+    "voting_latency_ms": 150.26569366455078,
+    "dictatorship_latency_ms": 201.13539695739746,
+    "task_type": "Rewrite",
+    "complexity": 0.66527,
+    "council_response": "[CODING simulation] Processed: What is the capital of France?...",
+    "majority_response": "[CODING simulation] Processed: What is the capital of France?...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: What is the capital of France?...",
+      "multimodal": "[MULTIMODAL simulation] Processed: What is the capital of France?...",
+      "general": "[GENERAL simulation] Processed: What is the capital of France?..."
+    }
+  },
+  {
+    "prompt": "Write a poem about the sea in Shakespearean style",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.109148025512695,
+    "voting_latency_ms": 150.27189254760742,
+    "dictatorship_latency_ms": 200.531005859375,
+    "task_type": "Unknown",
+    "complexity": 0.71617,
+    "council_response": "[CODING simulation] Processed: Write a Shakespearean sonnet about the sea, focusing on its vastness, power, and...",
+    "majority_response": "[CODING simulation] Processed: Write a Shakespearean sonnet about the sea, focusing on its vastness, power, and...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Write a Shakespearean sonnet about the sea, focusing on its vastness, power, and...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Write a Shakespearean sonnet about the sea, focusing on its vastness, power, and...",
+      "general": "[GENERAL simulation] Processed: Write a Shakespearean sonnet about the sea, focusing on its vastness, power, and..."
+    }
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet in three sentences",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12226104736328,
+    "voting_latency_ms": 150.30646324157715,
+    "dictatorship_latency_ms": 200.43110847473145,
+    "task_type": "Unknown",
+    "complexity": 0.62689,
+    "council_response": "[CODING simulation] Processed: Summarize the plot of Hamlet in three sentences, focusing on the main conflict a...",
+    "majority_response": "[CODING simulation] Processed: Summarize the plot of Hamlet in three sentences, focusing on the main conflict a...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Summarize the plot of Hamlet in three sentences, focusing on the main conflict a...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Summarize the plot of Hamlet in three sentences, focusing on the main conflict a...",
+      "general": "[GENERAL simulation] Processed: Summarize the plot of Hamlet in three sentences, focusing on the main conflict a..."
+    }
+  },
+  {
+    "prompt": "Tell me a programming joke",
+    "expected": "general",
+    "council_selected": "multimodal",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.11701583862305,
+    "voting_latency_ms": 150.31695365905762,
+    "dictatorship_latency_ms": 200.65903663635254,
+    "task_type": "Closed QA",
+    "complexity": 0.69688,
+    "council_response": "[MULTIMODAL simulation] Processed: Share a programming joke with a pun....",
+    "majority_response": "[CODING simulation] Processed: Share a programming joke with a pun....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Share a programming joke with a pun....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Share a programming joke with a pun....",
+      "general": "[GENERAL simulation] Processed: Share a programming joke with a pun...."
+    }
+  },
+  {
+    "prompt": "What is the boiling point of water in Fahrenheit?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.103187561035156,
+    "voting_latency_ms": 150.41041374206543,
+    "dictatorship_latency_ms": 201.46417617797852,
+    "task_type": "Unknown",
+    "complexity": 0.64567,
+    "council_response": "[CODING simulation] Processed: What is the boiling point of water in Fahrenheit?...",
+    "majority_response": "[CODING simulation] Processed: What is the boiling point of water in Fahrenheit?...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: What is the boiling point of water in Fahrenheit?...",
+      "multimodal": "[MULTIMODAL simulation] Processed: What is the boiling point of water in Fahrenheit?...",
+      "general": "[GENERAL simulation] Processed: What is the boiling point of water in Fahrenheit?..."
+    }
+  },
+  {
+    "prompt": "Explain why the sky is blue to a 5-year-old",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.130367279052734,
+    "voting_latency_ms": 150.37155151367188,
+    "dictatorship_latency_ms": 200.46663284301758,
+    "task_type": "Unknown",
+    "complexity": 0.62029,
+    "council_response": "[CODING simulation] Processed: Describe why the sky appears blue to a child using simple language and relatable...",
+    "majority_response": "[CODING simulation] Processed: Describe why the sky appears blue to a child using simple language and relatable...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Describe why the sky appears blue to a child using simple language and relatable...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Describe why the sky appears blue to a child using simple language and relatable...",
+      "general": "[GENERAL simulation] Processed: Describe why the sky appears blue to a child using simple language and relatable..."
+    }
+  },
+  {
+    "prompt": "Write a short story about a robot learning to paint",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.14228820800781,
+    "voting_latency_ms": 150.38633346557617,
+    "dictatorship_latency_ms": 200.76298713684082,
+    "task_type": "Other",
+    "complexity": 0.64801,
+    "council_response": "[CODING simulation] Processed: Write a short story about a robot named R2, who is assigned to paint a portrait ...",
+    "majority_response": "[CODING simulation] Processed: Write a short story about a robot named R2, who is assigned to paint a portrait ...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Write a short story about a robot named R2, who is assigned to paint a portrait ...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Write a short story about a robot named R2, who is assigned to paint a portrait ...",
+      "general": "[GENERAL simulation] Processed: Write a short story about a robot named R2, who is assigned to paint a portrait ..."
+    }
+  },
+  {
+    "prompt": "What are the health benefits of drinking green tea?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.1251220703125,
+    "voting_latency_ms": 150.29668807983398,
+    "dictatorship_latency_ms": 200.49047470092773,
+    "task_type": "Unknown",
+    "complexity": 0.5692,
+    "council_response": "[CODING simulation] Processed: Describe the health benefits of drinking green tea, including its antioxidant pr...",
+    "majority_response": "[CODING simulation] Processed: Describe the health benefits of drinking green tea, including its antioxidant pr...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Describe the health benefits of drinking green tea, including its antioxidant pr...",
+      "multimodal": "[MULTIMODAL simulation] Processed: Describe the health benefits of drinking green tea, including its antioxidant pr...",
+      "general": "[GENERAL simulation] Processed: Describe the health benefits of drinking green tea, including its antioxidant pr..."
+    }
+  },
+  {
+    "prompt": "What is 2 + 2?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.13394355773926,
+    "voting_latency_ms": 150.27284622192383,
+    "dictatorship_latency_ms": 200.75035095214844,
+    "task_type": "Unknown",
+    "complexity": 0.62535,
+    "council_response": "[CODING simulation] Processed: Explain the mathematical result of 2 + 2, which is 4....",
+    "majority_response": "[CODING simulation] Processed: Explain the mathematical result of 2 + 2, which is 4....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Explain the mathematical result of 2 + 2, which is 4....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Explain the mathematical result of 2 + 2, which is 4....",
+      "general": "[GENERAL simulation] Processed: Explain the mathematical result of 2 + 2, which is 4...."
+    }
+  },
+  {
+    "prompt": "Who wrote Romeo and Juliet?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.10986328125,
+    "voting_latency_ms": 150.3453254699707,
+    "dictatorship_latency_ms": 200.6552219390869,
+    "task_type": "Unknown",
+    "complexity": 0.58625,
+    "council_response": "[CODING simulation] Processed: Identify the author of the play *Romeo and Juliet*....",
+    "majority_response": "[CODING simulation] Processed: Identify the author of the play *Romeo and Juliet*....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Identify the author of the play *Romeo and Juliet*....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Identify the author of the play *Romeo and Juliet*....",
+      "general": "[GENERAL simulation] Processed: Identify the author of the play *Romeo and Juliet*...."
+    }
+  },
+  {
+    "prompt": "What is the chemical symbol for water?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.11606216430664,
+    "voting_latency_ms": 150.30789375305176,
+    "dictatorship_latency_ms": 200.53386688232422,
+    "task_type": "Unknown",
+    "complexity": 0.63285,
+    "council_response": "[CODING simulation] Processed: What is the chemical symbol for water?...",
+    "majority_response": "[CODING simulation] Processed: What is the chemical symbol for water?...",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: What is the chemical symbol for water?...",
+      "multimodal": "[MULTIMODAL simulation] Processed: What is the chemical symbol for water?...",
+      "general": "[GENERAL simulation] Processed: What is the chemical symbol for water?..."
+    }
+  },
+  {
+    "prompt": "How many continents are there?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12011528015137,
+    "voting_latency_ms": 150.27976036071777,
+    "dictatorship_latency_ms": 200.55222511291504,
+    "task_type": "Unknown",
+    "complexity": 0.67111,
+    "council_response": "[CODING simulation] Processed: Identify the number of continents in the world....",
+    "majority_response": "[CODING simulation] Processed: Identify the number of continents in the world....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Identify the number of continents in the world....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Identify the number of continents in the world....",
+      "general": "[GENERAL simulation] Processed: Identify the number of continents in the world...."
+    }
+  },
+  {
+    "prompt": "What color is the sky on a clear day?",
+    "expected": "general",
+    "council_selected": "coding",
+    "majority_selected": "coding",
+    "dictator_selected": "general",
+    "council_latency_ms": 50.12154579162598,
+    "voting_latency_ms": 150.37941932678223,
+    "dictatorship_latency_ms": 200.46257972717285,
+    "task_type": "Unknown",
+    "complexity": 0.65126,
+    "council_response": "[CODING simulation] Processed: Describe the color of a clear sky on a clear day....",
+    "majority_response": "[CODING simulation] Processed: Describe the color of a clear sky on a clear day....",
+    "dictator_response": "[GENERAL simulation] Processed: You are an expert evaluator. Given the following user request and three candidat...",
+    "all_responses": {
+      "coding": "[CODING simulation] Processed: Describe the color of a clear sky on a clear day....",
+      "multimodal": "[MULTIMODAL simulation] Processed: Describe the color of a clear sky on a clear day....",
+      "general": "[GENERAL simulation] Processed: Describe the color of a clear sky on a clear day...."
+    }
+  }
+]
