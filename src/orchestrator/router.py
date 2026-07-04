@@ -90,9 +90,11 @@ class Router:
         return score, f"general={score:.2f} ({', '.join(parts)})"
 
     def _score_coding(self, cls: ClassificationResult) -> tuple[float, str]:
-        # Gates: high-reasoning prompts (analysis/explanation) go elsewhere
+        # Gates: high-reasoning prompts (analysis/explanation) go elsewhere.
+        # EXCEPT when domain_knowledge is extremely high (>0.85) — clearly code expertise.
         if cls.reasoning > 0.03 and cls.task_type_1 != "Code Generation":
-            return 0.0, f"coding=0.00 (reasoning={cls.reasoning:.4f})"
+            if cls.domain_knowledge <= 0.85:
+                return 0.0, f"coding=0.00 (reasoning={cls.reasoning:.4f})"
         # Prompts the model sees as "low creativity" (structured) are not coding
         if cls.creativity_scope > 0.025 and cls.task_type_1 != "Code Generation":
             return 0.0, f"coding=0.00 (creativity={cls.creativity_scope:.4f})"
@@ -103,16 +105,18 @@ class Router:
         score = 0.0
         parts = []
 
-        # Creativity ≤ 0.025 means the model assigns HIGH creativity
-        # Paired with domain knowledge to distinguish code from general
-        if cls.domain_knowledge > 0.60:
-            score += 0.50
+        # Domain knowledge — strongest coding signal
+        if cls.domain_knowledge > 0.80:
+            score += 0.55
+            parts.append(f"domain_know={cls.domain_knowledge:.4f}")
+        elif cls.domain_knowledge > 0.60:
+            score += 0.45
             parts.append(f"domain_know={cls.domain_knowledge:.4f}")
         elif cls.domain_knowledge > 0.40:
-            score += 0.40
+            score += 0.35
             parts.append(f"domain_know={cls.domain_knowledge:.4f}")
         else:
-            score += 0.20
+            score += 0.15
             parts.append(f"domain_know={cls.domain_knowledge:.4f}")
 
         # Low constraint → more open-ended → coding
@@ -120,10 +124,18 @@ class Router:
             score += 0.10
             parts.append(f"constraint={cls.constraint_ct:.4f}")
 
+        # Very high domain knowledge + moderate constraint = structured code explanation
+        if cls.domain_knowledge > 0.80 and 0.005 < cls.constraint_ct <= 0.04:
+            score += 0.15
+            parts.append(f"structured_code={cls.constraint_ct:.4f}")
+
         # Task type bonus
         if cls.task_type_1 == "Code Generation":
             score += 0.25
             parts.append(f"task={cls.task_type_1}")
+        if cls.task_type_2 == "Code Generation":
+            score += 0.15
+            parts.append(f"task_2={cls.task_type_2}")
 
         score = min(score, 0.95)
         return score, f"coding={score:.2f} ({', '.join(parts)})"
@@ -146,7 +158,8 @@ class Router:
                 parts.append(f"low_creativity={cls.creativity_scope:.4f}")
 
         # Low domain knowledge + moderate creativity signal → creative non-technical
-        if cls.domain_knowledge < 0.50 and cls.creativity_scope > 0.025:
+        # Threshold 0.02 captures borderline planning/creative prompts (itineraries, etc.)
+        if cls.domain_knowledge < 0.50 and cls.creativity_scope > 0.02:
             score += 0.20
             parts.append("creative_non_technical=1")
 
@@ -159,6 +172,11 @@ class Router:
         if cls.task_type_2 in {"Text Generation", "Brainstorming", "Rewrite"}:
             score += 0.15
             parts.append(f"task_2={cls.task_type_2}")
+
+        # Planning tasks: high prompt_complexity + low domain → planning/long-form
+        if cls.prompt_complexity_score > 0.50 and cls.domain_knowledge < 0.50:
+            score += 0.10
+            parts.append(f"planning={cls.prompt_complexity_score:.3f}")
 
         score = min(score, 0.95)
         return score, f"multimodal={score:.2f} ({', '.join(parts)})" if parts else "multimodal=0.00"

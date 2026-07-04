@@ -1,15 +1,22 @@
+import base64
 import logging
 import os
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, List, Optional
 
 import requests
 from huggingface_hub import InferenceClient
 from openai import OpenAI
 
-from config.pipeline_config import EXPERT_MODELS, HF_BASE_URL
+from config.pipeline_config import (
+    EXPERT_MODELS,
+    INFERENCE_BACKEND,
+    OLLAMA_BASE_URL,
+    get_inference_api_key,
+    get_inference_base_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +35,7 @@ class ModelAdapter(ABC):
         cfg = EXPERT_MODELS[expert_key]
         self.key = expert_key
         self.model_id = cfg["model_id"]
-        self.provider = cfg["provider"]
         self.description = cfg["description"]
-        self.method = cfg["method"]
-        self._token = os.environ.get("HF_TOKEN", "")
 
     @abstractmethod
     def generate(self, prompt: str, **kwargs) -> ModelResponse:
@@ -39,40 +43,17 @@ class ModelAdapter(ABC):
 
 
 class OpenAICompatibleAdapter(ModelAdapter):
-    """Adapter for models served via the OpenAI-compatible HF router."""
+    """Adapter for OpenAI-compatible APIs (Ollama, HF Router, Together, etc.)."""
 
     def __init__(self, expert_key: str):
         super().__init__(expert_key)
-        full_model = self.model_id
-        if self.provider:
-            full_model = f"{full_model}:{self.provider}"
-        self._full_model_id = full_model
-        self._client = OpenAI(base_url=HF_BASE_URL, api_key=self._token)
-
-    def generate(self, prompt: str, **kwargs) -> ModelResponse:
-        start = time.time()
-        messages = [{"role": "user", "content": prompt}]
-        resp = self._client.chat.completions.create(
-            model=self._full_model_id,
-            messages=messages,
-            **kwargs,
+        base_url = get_inference_base_url()
+        api_key = get_inference_api_key()
+        self._client = OpenAI(base_url=base_url, api_key=api_key)
+        logger.info(
+            "OpenAICompatibleAdapter[%s]: model=%s base_url=%s",
+            expert_key, self.model_id, base_url,
         )
-        latency = (time.time() - start) * 1000
-        choice = resp.choices[0]
-        return ModelResponse(
-            text=choice.message.content or "",
-            model_name=self.model_id,
-            latency_ms=latency,
-            tokens_used=choice.get_stats().usage.total_tokens if hasattr(choice, "get_stats") else None,
-        )
-
-
-class InferenceClientAdapter(ModelAdapter):
-    """Adapter for models served via HF InferenceClient."""
-
-    def __init__(self, expert_key: str):
-        super().__init__(expert_key)
-        self._client = InferenceClient(api_key=self._token)
 
     def generate(self, prompt: str, **kwargs) -> ModelResponse:
         start = time.time()
@@ -83,10 +64,15 @@ class InferenceClientAdapter(ModelAdapter):
             **kwargs,
         )
         latency = (time.time() - start) * 1000
+        choice = resp.choices[0]
         return ModelResponse(
-            text=resp.choices[0].message.content or "",
+            text=choice.message.content or "",
             model_name=self.model_id,
             latency_ms=latency,
+            tokens_used=(
+                choice.get_stats().usage.total_tokens
+                if hasattr(choice, "get_stats") else None
+            ),
         )
 
 
@@ -107,18 +93,47 @@ class DummyAdapter(ModelAdapter):
         )
 
 
-ADAPTER_REGISTRY = {
-    "openai": OpenAICompatibleAdapter,
-    "inference_client": InferenceClientAdapter,
-}
+class OllamaAdapter(ModelAdapter):
+    """Adapter using native Ollama API — supports images for vision models."""
+
+    def __init__(self, expert_key: str):
+        super().__init__(expert_key)
+        base_url = OLLAMA_BASE_URL.replace("/v1", "")
+        self._api_url = f"{base_url}/api/chat"
+        logger.info(
+            "OllamaAdapter[%s]: model=%s api_url=%s",
+            expert_key, self.model_id, self._api_url,
+        )
+
+    def generate(self, prompt: str, images: Optional[List[str]] = None, **kwargs) -> ModelResponse:
+        start = time.time()
+        payload: Dict = {
+            "model": self.model_id,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": False,
+            "options": {"num_predict": kwargs.get("max_tokens", 2048)},
+        }
+        if images:
+            payload["messages"][0]["images"] = images
+
+        resp = requests.post(self._api_url, json=payload, timeout=180)
+        resp.raise_for_status()
+        data = resp.json()
+        latency = (time.time() - start) * 1000
+        text = data.get("message", {}).get("content", "")
+        return ModelResponse(
+            text=text,
+            model_name=self.model_id,
+            latency_ms=latency,
+        )
 
 
 def build_adapter(expert_key: str, dummy: bool = False) -> ModelAdapter:
     if dummy:
         return DummyAdapter(expert_key)
-    cfg = EXPERT_MODELS[expert_key]
-    adapter_cls = ADAPTER_REGISTRY.get(cfg["method"], OpenAICompatibleAdapter)
-    return adapter_cls(expert_key)
+    if expert_key == "multimodal" and INFERENCE_BACKEND.lower() == "ollama":
+        return OllamaAdapter(expert_key)
+    return OpenAICompatibleAdapter(expert_key)
 
 
 CodingAdapter = lambda dummy=False: build_adapter("coding", dummy)
