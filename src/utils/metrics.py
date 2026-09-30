@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 
 from config.pipeline_config import EVAL
 from src.engines.classifier import ClassificationResult
-from src.orchestrator.router import RoutingDecision
+from src.orchestrator.hybrid_router import HybridRoutingDecision as RoutingDecision
 from src.utils.energy import EnergyReport
 
 logger = logging.getLogger(__name__)

@@ -3,9 +3,11 @@ Comparison Routing Modes for Research Evaluation
 -------------------------------------------------
 Implements three routing paradigms for benchmarking:
 
-1. Council Mode  — intelligent pipeline (enhance → classify → route → infer)
+1. Council Mode  — intelligent pipeline (classify → hybrid_route → infer)
 2. Majority Voting — all 3 experts respond, majority vote decides final
 3. Dictatorship   — all 3 experts respond, a dedicated judge picks the best
+
+Hybrid Router uses Qwen3.5-2B with full classifier metric context (5 categories).
 """
 
 import logging
@@ -13,15 +15,15 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
-from config.pipeline_config import DICTATOR_JUDGE_MODEL, EXPERT_MODELS
+from config.pipeline_config import DICTATOR_JUDGE_MODEL, EXPERT_MODELS, ROUTE_TO_MODEL
 from src.engines.classifier import ClassificationResult, PromptClassifier
-from src.engines.enhancer import PromptEnhancer
 from src.models.adapters import ModelAdapter, ModelResponse, build_adapter
-from src.orchestrator.router import Router, RoutingDecision
+from src.orchestrator.hybrid_router import HybridRouter, HybridRoutingDecision
 from src.utils.energy import EnergyMonitor, EnergyReport
 
 logger = logging.getLogger(__name__)
 
+# 3 actual model experts (map from 5 routing categories via ROUTE_TO_MODEL)
 ALL_EXPERTS = ["coding", "multimodal", "general"]
 
 
@@ -30,10 +32,11 @@ class ComparisonResult:
     prompt: str
     enriched: str
     classification: Optional[ClassificationResult]
-    routing: Optional[RoutingDecision]
+    routing: Optional[HybridRoutingDecision]
 
     council_response: Optional[ModelResponse]
-    council_expert: Optional[str]
+    council_expert: Optional[str]     # the 3-key expert name
+    council_route: Optional[str]      # the 5-key route name
 
     all_responses: Dict[str, ModelResponse]
     majority_vote_result: Optional[str]
@@ -53,6 +56,7 @@ class ComparisonResult:
             "enriched": self.enriched[:80],
             "classification_task": self.classification.task_type_1 if self.classification else "N/A",
             "complexity": self.classification.prompt_complexity_score if self.classification else 0.0,
+            "council_route": self.council_route,
             "council_expert": self.council_expert,
             "majority_result": self.majority_vote_result,
             "dictator_expert": self.dictator_chosen_expert,
@@ -146,16 +150,14 @@ class ComparisonRunner:
         self,
         use_dummy: bool = False,
         enable_energy: bool = True,
-        enhancer_device=None,
         classifier_device=None,
     ):
         self.use_dummy = use_dummy
-        self._enhancer = PromptEnhancer(device=enhancer_device)
         self._classifier = PromptClassifier(device=classifier_device)
-        self._router = Router()
+        self._router = HybridRouter()
         self._energy_enabled = enable_energy and not use_dummy
 
-        # Build expert adapters (ornith, qwen3.5, lfm2.5)
+        # Build expert adapters (ornith, qwen3.5, lfm2.5 — 3 actual models)
         self._adapters: Dict[str, ModelAdapter] = {}
         for key in ALL_EXPERTS:
             self._adapters[key] = build_adapter(key, dummy=use_dummy)
@@ -224,13 +226,14 @@ class ComparisonRunner:
         return self._adapters[key].generate(prompt)
 
     def run_comparison(self, prompt: str, mode: str = "all",
-                       force_expert: Optional[str] = None,
+                       force_route: Optional[str] = None,
+                       filenames: Optional[List[str]] = None,
                        images: Optional[List[str]] = None) -> ComparisonResult:
-        enriched = self._enhancer.enhance(prompt)
         cls = self._classifier.classify(prompt)
-        decision = self._router.route(cls, raw_prompt=prompt)
-        if force_expert is not None and force_expert in ALL_EXPERTS:
-            decision.selected_expert = force_expert
+        decision = self._router.route(cls, raw_prompt=prompt, filenames=filenames)
+        if force_route is not None and force_route in ROUTE_TO_MODEL:
+            decision.selected_route = force_route
+        council_expert_key = ROUTE_TO_MODEL.get(decision.selected_route, "general")
 
         empty = ModelResponse(text="", model_name="", latency_ms=0.0)
         empty_responses: Dict[str, ModelResponse] = {}
@@ -239,18 +242,17 @@ class ComparisonRunner:
 
         if mode == "council":
             t0 = time.time()
-            chosen = decision.selected_expert
-            council_resp = self._generate_for_expert(chosen, enriched, images=images)
+            council_resp = self._generate_for_expert(council_expert_key, prompt, images=images)
             council_latency = (time.time() - t0) * 1000
-            all_expert_responses[chosen] = council_resp
+            all_expert_responses[council_expert_key] = council_resp
             total_gen_time = council_latency
         else:
             t_all_start = time.time()
-            all_expert_responses = self.generate_all_expert_responses(enriched, images=images)
+            all_expert_responses = self.generate_all_expert_responses(prompt, images=images)
             total_gen_time = (time.time() - t_all_start) * 1000
 
             if mode in ("council", "all"):
-                council_resp = all_expert_responses[decision.selected_expert]
+                council_resp = all_expert_responses.get(council_expert_key, empty)
                 council_latency = council_resp.latency_ms
             else:
                 council_resp = empty
@@ -260,11 +262,10 @@ class ComparisonRunner:
         vote_winner = ""
         vote_conf = 0.0
 
-        # --- Majority voting ---
         if mode in ("voting", "all"):
             t0 = time.time()
             vote_responses, vote_winner, vote_conf, _ = self._voting.run(
-                enriched, pre_generated=all_expert_responses,
+                prompt, pre_generated=all_expert_responses,
             )
             voting_latency_total = total_gen_time + (time.time() - t0) * 1000
         else:
@@ -274,11 +275,10 @@ class ComparisonRunner:
         dict_chosen = ""
         dict_judge_resp = empty
 
-        # --- Dictatorship ---
         if mode in ("dictator", "all"):
             t0 = time.time()
             dict_responses, dict_chosen, dict_judge_resp, judge_time = self._dictatorship.run(
-                enriched, pre_generated=all_expert_responses,
+                prompt, pre_generated=all_expert_responses,
             )
             dict_latency_total = total_gen_time + judge_time
         else:
@@ -296,7 +296,7 @@ class ComparisonRunner:
 
         all_responses = all_expert_responses if vote_responses else {}
         if council_resp and council_resp.text:
-            all_responses[decision.selected_expert] = council_resp
+            all_responses[council_expert_key] = council_resp
 
         energy = None
         if self._energy_enabled:
@@ -307,11 +307,12 @@ class ComparisonRunner:
 
         return ComparisonResult(
             prompt=prompt,
-            enriched=enriched,
+            enriched=prompt,
             classification=cls,
             routing=decision,
             council_response=council_resp,
-            council_expert=decision.selected_expert,
+            council_expert=council_expert_key,
+            council_route=decision.selected_route,
             all_responses=all_responses,
             majority_vote_result=vote_winner,
             majority_confidence=vote_conf,

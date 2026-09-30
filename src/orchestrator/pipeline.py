@@ -3,10 +3,9 @@ Main Orchestration Pipeline
 ----------------------------
 Chains the full workflow:
   1. Clarification (optional)
-  2. Prompt Enhancement (local)
-  3. Prompt Classification (local)
-  4. Routing (lightweight rules)
-  5. Inference (cloud HF expert model)
+  2. Prompt Classification (local)
+  3. Routing (HybridRouter — Qwen3.5-2B with classifier metrics)
+  4. Inference (Ollama expert model)
 """
 
 import logging
@@ -20,9 +19,8 @@ from config.pipeline_config import (
     MAX_CLARIFICATION_ROUNDS,
 )
 from src.engines.classifier import ClassificationResult, PromptClassifier
-from src.engines.enhancer import PromptEnhancer
 from src.models.adapters import ModelAdapter, ModelResponse, build_adapter
-from src.orchestrator.router import Router, RoutingDecision
+from src.orchestrator.hybrid_router import HybridRouter, HybridRoutingDecision as RoutingDecision
 from src.utils.energy import EnergyMonitor, EnergyReport
 from src.utils.metrics import MetricsCollector
 
@@ -46,13 +44,11 @@ class LLMCouncilPipeline:
         self,
         use_dummy_models: bool = False,
         enable_energy_monitoring: bool = True,
-        enhancer_device: Optional[int] = None,
         classifier_device: Optional[int] = None,
     ):
         self.use_dummy = use_dummy_models
-        self._enhancer = PromptEnhancer(device=enhancer_device)
         self._classifier = PromptClassifier(device=classifier_device)
-        self._router = Router()
+        self._router = HybridRouter()
         self._energy_enabled = enable_energy_monitoring and not use_dummy_models
         self._adapter_cache: Dict[str, ModelAdapter] = {}
         self._metrics = MetricsCollector()
@@ -68,18 +64,14 @@ class LLMCouncilPipeline:
 
         t0 = time.time()
 
-        enriched = self._enhancer.enhance(prompt)
-        latencies["enhance"] = (time.time() - t0) * 1000
-
-        cls = self._classifier.classify(enriched)
-        latencies["classify"] = (time.time() - t0 - latencies["enhance"] / 1000) * 1000
+        cls = self._classifier.classify(prompt)
+        latencies["classify"] = (time.time() - t0) * 1000
 
         decision = self._router.route(cls, raw_prompt=prompt)
 
         adapter = self._get_adapter(decision.selected_expert)
-        response = adapter.generate(enriched)
-        latencies["inference"] = (time.time() - t0 -
-                                  (latencies["enhance"] + latencies["classify"]) / 1000) * 1000
+        response = adapter.generate(prompt)
+        latencies["inference"] = (time.time() - t0 - latencies["classify"] / 1000) * 1000
 
         latencies["total"] = (time.time() - t0) * 1000
 
@@ -89,7 +81,7 @@ class LLMCouncilPipeline:
 
         self._metrics.record(
             original_prompt=prompt,
-            enriched_prompt=enriched,
+            enriched_prompt=prompt,
             decision=decision,
             cls=cls,
             latencies=latencies,
@@ -98,7 +90,7 @@ class LLMCouncilPipeline:
 
         return PipelineResult(
             original_prompt=prompt,
-            enriched_prompt=enriched,
+            enriched_prompt=prompt,
             classification=cls,
             routing=decision,
             response=response,

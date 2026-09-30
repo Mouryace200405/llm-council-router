@@ -66,6 +66,19 @@ EXPERT_MODELS: Dict[str, Dict] = {
 DEFAULT_EXPERT = "general"
 
 # ---------------------------------------------------------------------------
+# Routing category → model mapping (HybridRouter outputs 5 categories)
+# ---------------------------------------------------------------------------
+ROUTE_TO_MODEL = {
+    "coder": "coding",
+    "rag": "multimodal",
+    "multimodal": "multimodal",
+    "reasoning": "multimodal",
+    "general": "general",
+}
+
+ALL_ROUTES = list(ROUTE_TO_MODEL.keys())
+
+# ---------------------------------------------------------------------------
 # Dictatorship judge model
 # ---------------------------------------------------------------------------
 DICTATOR_JUDGE_MODEL = "granite4.1-guardian:8b-q4_K_S"

@@ -80,7 +80,9 @@ class DummyAdapter(ModelAdapter):
     """Lightweight dummy adapter for testing without network calls."""
 
     def __init__(self, expert_key: str):
-        super().__init__(expert_key)
+        self.key = expert_key
+        self.model_id = f"dummy_{expert_key}"
+        self.description = f"Dummy {expert_key}"
 
     def generate(self, prompt: str, **kwargs) -> ModelResponse:
         start = time.time()
@@ -107,16 +109,27 @@ class OllamaAdapter(ModelAdapter):
 
     def generate(self, prompt: str, images: Optional[List[str]] = None, **kwargs) -> ModelResponse:
         start = time.time()
+        options = {"num_predict": kwargs.get("max_tokens", 2048)}
+        # When images are present, reduce GPU layers to leave VRAM for vision encoder
+        if images:
+            options["num_gpu"] = kwargs.get("num_gpu", 10)
         payload: Dict = {
             "model": self.model_id,
             "messages": [{"role": "user", "content": prompt}],
             "stream": False,
-            "options": {"num_predict": kwargs.get("max_tokens", 2048)},
+            "options": options,
         }
         if images:
             payload["messages"][0]["images"] = images
 
-        resp = requests.post(self._api_url, json=payload, timeout=180)
+        resp = requests.post(self._api_url, json=payload, timeout=600)
+        if not resp.ok:
+            logger.error(
+                "OllamaAdapter[%s] HTTP %d: %s | model=%s prompt_len=%d images=%s",
+                self.key, resp.status_code, resp.text[:500],
+                self.model_id, len(prompt),
+                len(images) if images else 0,
+            )
         resp.raise_for_status()
         data = resp.json()
         latency = (time.time() - start) * 1000
@@ -131,11 +144,14 @@ class OllamaAdapter(ModelAdapter):
 def build_adapter(expert_key: str, dummy: bool = False) -> ModelAdapter:
     if dummy:
         return DummyAdapter(expert_key)
-    if expert_key == "multimodal" and INFERENCE_BACKEND.lower() == "ollama":
+    # rag and reasoning use the same model as multimodal (qwen3.5:9b)
+    if expert_key in ("multimodal", "rag", "reasoning") and INFERENCE_BACKEND.lower() == "ollama":
         return OllamaAdapter(expert_key)
     return OpenAICompatibleAdapter(expert_key)
 
 
 CodingAdapter = lambda dummy=False: build_adapter("coding", dummy)
 MultimodalAdapter = lambda dummy=False: build_adapter("multimodal", dummy)
+RagAdapter = lambda dummy=False: build_adapter("rag", dummy)
+ReasoningAdapter = lambda dummy=False: build_adapter("reasoning", dummy)
 GeneralAdapter = lambda dummy=False: build_adapter("general", dummy)

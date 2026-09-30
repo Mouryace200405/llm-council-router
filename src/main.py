@@ -32,8 +32,7 @@ def format_result(result):
     lines.append("=" * 70)
     lines.append("LLM COUNCIL ROUTER — RESULT")
     lines.append("=" * 70)
-    lines.append(f"Original:     {result.original_prompt[:80]}...")
-    lines.append(f"Enriched:     {result.enriched_prompt[:80]}...")
+    lines.append(f"Prompt:       {result.original_prompt[:80]}...")
     lines.append("")
     lines.append("--- Classification ---")
     lines.append(f"  Task (Primary):    {result.classification.task_type_1}")
@@ -53,7 +52,6 @@ def format_result(result):
         lines.append(f"  Reason:            {reason}")
     lines.append("")
     lines.append("--- Latency ---")
-    lines.append(f"  Enhance:   {result.latencies.get('enhance', 0):8.1f} ms")
     lines.append(f"  Classify:  {result.latencies.get('classify', 0):8.1f} ms")
     lines.append(f"  Inference: {result.latencies.get('inference', 0):8.1f} ms")
     lines.append(f"  Total:     {result.latencies.get('total', 0):8.1f} ms")
@@ -145,8 +143,6 @@ def main():
                         help="Use dummy adapters (no network calls)")
     parser.add_argument("--benchmark", "-b", action="store_true", help="Run benchmark")
     parser.add_argument("--demo", action="store_true", help="Run demo with sample prompts")
-    parser.add_argument("--enhancer-device", type=int, default=None,
-                        help="Device for enhancer (0=GPU, -1=CPU)")
     parser.add_argument("--classifier-device", type=int, default=None,
                         help="Device for classifier (0=GPU, -1=CPU)")
     args = parser.parse_args()
@@ -154,7 +150,6 @@ def main():
     pipeline = LLMCouncilPipeline(
         use_dummy_models=args.dummy,
         enable_energy_monitoring=True,
-        enhancer_device=args.enhancer_device,
         classifier_device=args.classifier_device,
     )
 
